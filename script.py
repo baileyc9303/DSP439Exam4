@@ -72,8 +72,6 @@ def write_results_to_file(kmer_data, output_filename):
     Write_results_to_file Function:
     this function writes the kmer total_count next_char:frequency
     """
-
-    sorted_kmers = sorted(kmer_data.keys())
     
     # sorts the k-mers from A-Z
     with open(output_filename, 'w') as f:
@@ -97,6 +95,9 @@ def main():
     - Aggregates kmer data
     - Writes results
     """
+
+    if len(sys.argv) != 4:
+        sys.exit(1)
 
     sequence_file = sys.argv[1]
     k = int(sys.argv[2])
@@ -132,7 +133,7 @@ def main():
                     kmer_data[kmer]['next_chars'][char] += freq
             
             # Final output
-            write_results_to_file(kmer_data, output_file)
+        write_results_to_file(kmer_data, output_file)
 
 if __name__ == '__main__':
     main()
