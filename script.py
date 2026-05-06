@@ -3,14 +3,15 @@ import sys
 def validate_sequence(sequence, k):
     if len(sequence) < k:
         return False
+    valid_chars = {'A', 'C', 'G', 'T'}
     for nucleotide in sequence:
-        if nucleotide in '1234567890':
+        if nucleotide not in valid_chars:
             return False
     return True
 
 def update_kmer_count(kmer_data, kmer, next_char):
     if kmer not in kmer_data:
-        kmer_data[kmer] = {'count': 1, 'next_chars': {}}
+        kmer_data[kmer] = {'count': 0, 'next_chars': {}}
     
     kmer_data[kmer]['count'] += 1
     
@@ -36,7 +37,8 @@ def write_results_to_file(kmer_data, output_filename):
     sorted_kmers = sorted(kmer_data.keys())
     
     with open(output_filename, 'w') as f:
-        for kmer in sorted_kmers:
+        for kmer in sorted(kmer_data.keys()):
+            total = kmer_data[kmer]['count']
             next_chars = kmer_data[kmer]['next_chars']
             
             next_char_str = " ".join(
@@ -51,6 +53,8 @@ def main():
     sequence_file = sys.argv[1]
     k = int(sys.argv[2])
     output_file = sys.argv[3]
+
+    kmer_data = {}
     
     print(f"Reading sequences from {sequence_file}...")
 
@@ -61,6 +65,20 @@ def main():
             if not validate_sequence(sequence, k):
                 print(f"  Warning: Skipping sequence")
                 continue
+
+            seq_data = count_kmers_with_context(sequence, k)
+
+            # merge the results
+            for kmer, data in seq_data.items():
+                if kmer not in kmer_data:
+                    kmer_data[kmer] = {'count': 0, 'next_chars': {}}
+
+                kmer_data[kmer]['count'] += data['count']
+
+                for char, freq in data['next_chars'].items():
+                    if char not in kmer_data[kmer]['next_chars']:
+                        kmer_data[kmer]['next_chars'][char] = 0
+                    kmer_data[kmer]['next_chars'][char] += freq
             
             kmer_data = count_kmers_with_context(sequence, k) 
             
