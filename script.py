@@ -9,9 +9,14 @@ def validate_sequence(sequence, k):
     - Contains only A, C, G, T chars
     """
 
+    # if the length of k-mer is too short, reject it
     if len(sequence) < k:
         return False
+    
+    #make sure it's a valid DNA character
     valid_chars = {'A', 'C', 'G', 'T'}
+
+    # check each char in the sequence
     for nucleotide in sequence:
         if nucleotide not in valid_chars:
             return False
@@ -25,11 +30,14 @@ def update_kmer_count(kmer_data, kmer, next_char):
     - Updated frequency of next character
     """
 
+    # if the k-mer has't been recorded yet, initialize the record
     if kmer not in kmer_data:
         kmer_data[kmer] = {'count': 0, 'next_chars': {}}
     
+    # increase total count for the k-mer
     kmer_data[kmer]['count'] += 1
     
+    # track the char that follows current k-mer
     if next_char not in kmer_data[kmer]['next_chars']:
         kmer_data[kmer]['next_chars'][next_char] = 0
     kmer_data[kmer]['next_chars'][next_char] += 1
@@ -46,9 +54,13 @@ def count_kmers_with_context(sequence, k):
     kmer_data = {}
     
     for i in range(len(sequence) - k):
+        #current k-mer
         kmer = sequence[i:i+k]
+
+        # char after the k-mer
         next_char = sequence[i+k]
         
+        # this updates the disctionary
         kmer_data = update_kmer_count(kmer_data, kmer, next_char)
     
     return kmer_data
@@ -63,6 +75,7 @@ def write_results_to_file(kmer_data, output_filename):
 
     sorted_kmers = sorted(kmer_data.keys())
     
+    # sorts the k-mers from A-Z
     with open(output_filename, 'w') as f:
         for kmer in sorted(kmer_data.keys()):
             total = kmer_data[kmer]['count']
@@ -89,6 +102,7 @@ def main():
     k = int(sys.argv[2])
     output_file = sys.argv[3]
 
+    # dictionary to hold sequences
     kmer_data = {}
     
     print(f"Reading sequences from {sequence_file}...")
@@ -108,15 +122,16 @@ def main():
                 if kmer not in kmer_data:
                     kmer_data[kmer] = {'count': 0, 'next_chars': {}}
 
+                # add counts
                 kmer_data[kmer]['count'] += data['count']
 
+                # Merge next character freqs
                 for char, freq in data['next_chars'].items():
                     if char not in kmer_data[kmer]['next_chars']:
                         kmer_data[kmer]['next_chars'][char] = 0
                     kmer_data[kmer]['next_chars'][char] += freq
             
-            kmer_data = count_kmers_with_context(sequence, k) 
-            
+            # Final output
             write_results_to_file(kmer_data, output_file)
 
 if __name__ == '__main__':
