@@ -1,6 +1,14 @@
 import sys
 
 def validate_sequence(sequence, k):
+
+    """
+    Validate_sequence Function: 
+    Validates that a DNA sequence
+    - Is at least the length of k
+    - Contains only A, C, G, T chars
+    """
+
     if len(sequence) < k:
         return False
     valid_chars = {'A', 'C', 'G', 'T'}
@@ -10,6 +18,13 @@ def validate_sequence(sequence, k):
     return True
 
 def update_kmer_count(kmer_data, kmer, next_char):
+
+    """
+    update_kmer_count Function:
+    - Updates total count of kmer
+    - Updated frequency of next character
+    """
+
     if kmer not in kmer_data:
         kmer_data[kmer] = {'count': 0, 'next_chars': {}}
     
@@ -22,6 +37,12 @@ def update_kmer_count(kmer_data, kmer, next_char):
     return kmer_data
 
 def count_kmers_with_context(sequence, k):
+
+    """
+    count_kmers_with_context FUnction:
+    This extracts all k-mers and tracks the character that follow.
+    """
+
     kmer_data = {}
     
     for i in range(len(sequence) - k):
@@ -34,6 +55,12 @@ def count_kmers_with_context(sequence, k):
 
 
 def write_results_to_file(kmer_data, output_filename):
+
+    """
+    Write_results_to_file Function:
+    this function writes the kmer total_count next_char:frequency
+    """
+
     sorted_kmers = sorted(kmer_data.keys())
     
     with open(output_filename, 'w') as f:
@@ -50,6 +77,14 @@ def write_results_to_file(kmer_data, output_filename):
 
 
 def main():
+
+    """
+    Main function:
+    - Reads sequences from file
+    - Aggregates kmer data
+    - Writes results
+    """
+
     sequence_file = sys.argv[1]
     k = int(sys.argv[2])
     output_file = sys.argv[3]
